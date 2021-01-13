@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Fertile Technofutures from Bidar</title>
+	<link rel="stylesheet" href="./lib/annotorious-openseadragon-2.2.0/annotorious.min.css">
+    <style>
+	
+	@font-face {
+    font-family: Lato;
+    src:local("./assets/Lato/Lato-Regular.ttf");
+	}
+      html, body {
+        margin:0;
+        padding:0;
+        background-color:#e2e2e2;
+        height:100%;
+        font-family:Lato;
+        line-height:160%;
+      }
+  
+      .column {
+        max-width:100%;
+        padding:20px;
+        margin:0 auto;
+        background-color:#fff;
+        height: auto;
+        box-sizing:border-box;
+      }
+
+      h1 {
+        font-size:21px;
+        font-weight:normal;
+        margin:0;
+        padding:0;
+      }
+
+      p.instructions {
+        padding:10px 0 0 0;
+      }
+
+      .openseadragon-canvas {
+        outline:none;
+        background-color:#002600 !important;
+      }
+
+      .a9s-selection-mask {
+        fill:rgba(0,0,0,0.6) !important;
+      }
+    </style>
+    <script>
+      window.onload = function() {
+        var viewer = OpenSeadragon({
+          id: "openseadragon",
+          prefixUrl: "./assets/images/",
+          tileSources: {
+            type: "image",
+            url: "./assets/nb v24.png"
+          },
+          gestureSettingsTouch: {
+            pinchRotate: true
+          }
+        });
+        
+        var anno = OpenSeadragon.Annotorious(viewer, {
+          locale: 'auto'
+        });
+
+        anno.setAuthInfo({
+          id: '',
+          displayName: 'Living Labs Network'
+        });
+
+        var toolToggle = document.getElementById('current-tool');
+        toolToggle.addEventListener('click', function() {
+          if (toolToggle.innerHTML == 'TOOL: RECTANGLE') {
+            toolToggle.innerHTML = 'TOOL: POLYGON';
+            anno.setDrawingTool('polygon');
+          } else {
+            toolToggle.innerHTML = 'TOOL: RECTANGLE';
+            anno.setDrawingTool('rect');
+          }
+        });
+
+        var modeBtn = document.getElementById('mode');
+        modeBtn.addEventListener('click', function() {
+          if (modeBtn.innerHTML == 'MODE: VIEW') {
+            modeBtn.innerHTML = 'MODE: ANNOTATE';
+            anno.setDrawingEnabled(true);
+          } else {
+            modeBtn.innerHTML = 'MODE: VIEW';
+            anno.setDrawingEnabled(false);
+          }
+        });
+
+        anno.on('createSelection', function(selection) {
+          console.log('selection', selection);
+          const { snippet } = anno.getSelectedImageSnippet();
+          // document.body.appendChild(snippet);
+        });
+
+        anno.on('selectAnnotation', function(annotation) {
+          console.log('selected', annotation);
+        });
+
+        anno.on('createAnnotation', function(a) {
+          console.log('created', a);
+          modeBtn.innerHTML = 'MODE: VIEW';
+        });
+
+        anno.on('cancelSelection', function(a) {
+          modeBtn.innerHTML = 'MODE: VIEW';
+        });
+
+        anno.on('updateAnnotation', function(annotation, previous) {
+          console.log('updated', previous, 'with', annotation);
+        });
+
+        anno.on('deleteAnnotation', function(annotation) {
+          console.log('deleted', annotation);
+        });
+
+        anno.on('mouseEnterAnnotation', function(annotation) {
+          console.log('mouseEnter', annotation);
+        });
+
+        anno.on('mouseLeaveAnnotation', function(annotation) {
+          console.log('mouseLeave', annotation);
+        });
+
+        anno.loadAnnotations('./annotations.w3c.json');
+      }
+    </script>
+  </head>
+  <body>
+    <div class="column">
+      <h1>Fertile Technofutures from Bidar</h1>
+      <p class="instructions">
+        Click the annotation to edit. Hold <strong>SHIFT</strong> while clicking and 
+        dragging the mouse to create a new annotation. 
+      </p>
+      <p>
+        <button id="current-tool">TOOL: RECTANGLE</button>
+        <button id="mode">MODE: VIEW</button>
+      </p>
+      <div id="openseadragon" style="width: 100%; height: 100vh;"></div>
+    </div>      
+	 <script src="./lib/openseadragon/openseadragon.2.4.2.min.js"></script>
+    <script src="./lib/annotorious-openseadragon-2.2.0/openseadragon-annotorious.min.js"></script>
+  </body>
+</html>
